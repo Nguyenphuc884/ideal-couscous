@@ -1,20 +1,44 @@
 function FindProxyForURL(url, host) {
-    // Chặn tất cả domain liên quan đến Free Fire
-    if (dnsDomainIs(host, "freefiremobile.com") ||
-        dnsDomainIs(host, "ff.garena.com") ||
-        dnsDomainIs(host, "cdn.garenanow.com") ||
-        dnsDomainIs(host, "dl.garenanow.com") ||
-        dnsDomainIs(host, "update.ff.garena.com") ||
-        dnsDomainIs(host, "sdkconfig.ff.garena.com") ||
-        dnsDomainIs(host, "sdk.api.garena.com") ||
-        dnsDomainIs(host, "account.garena.com") ||
-        dnsDomainIs(host, "auth.ff.garena.com") ||
-        dnsDomainIs(host, "api.ff.garena.com") ||
-        shExpMatch(host, "*.freefiremobile.com") ||
-        shExpMatch(host, "*.garena.com") ||
-        shExpMatch(host, "*.ff.garena.com") ||
-        shExpMatch(host, "*.cdn.garenanow.com")) {
-        return "PROXY 127.0.0.1:8080"; // Chặn hoàn toàn
+    // Danh sách domain cần chặn (Sảnh & Trong trận)
+    var blockDomains = [
+        "freefiremobile.com",
+        "ff.garena.com",
+        "cdn.garenanow.com",
+        "update.ff.garena.com",
+        "sdkconfig.ff.garena.com",
+        "sdk.api.garena.com",
+        "account.garena.com",
+        "auth.ff.garena.com",
+        "api.ff.garena.com",
+        "game.ff.garena.com",
+        "match.ff.garena.com",
+        "ranking.ff.garena.com"
+    ];
+
+    // Danh sách IP blacklist Garena
+    var blockIPs = [
+        "203.116.185.33",
+        "203.117.155.109",
+        "203.116.185.134",
+        "203.116.185.138",
+        "203.117.155.106",
+        "202.73.57.101",
+        "203.116.185.200"
+    ];
+
+    // Nếu là IP blacklist thì chặn luôn
+    for (var i = 0; i < blockIPs.length; i++) {
+        if (isInNet(host, blockIPs[i], "255.255.255.255")) {
+            return "PROXY 127.0.0.1:8080";
+        }
     }
-    return "DIRECT"; // Các kết nối khác hoạt động bình thường
+
+    // Nếu là domain cần chặn thì cũng chặn luôn
+    for (var i = 0; i < blockDomains.length; i++) {
+        if (dnsDomainIs(host, blockDomains[i]) || shExpMatch(host, "*." + blockDomains[i])) {
+            return "PROXY 127.0.0.1:8080";
+        }
+    }
+
+    return "DIRECT"; // Chặn tất cả Free Fire, còn lại hoạt động bình thường
 }
