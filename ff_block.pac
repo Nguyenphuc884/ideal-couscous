@@ -1,5 +1,5 @@
 function FindProxyForURL(url, host) {
-    // Chặn tất cả IP & domain liên quan đến Free Fire (mạnh hơn)
+    // Danh sách chặn tất cả IP & domain liên quan đến Free Fire
     var blockList = [
         "freefiremobile.com",
         "ff.garena.com",
@@ -19,11 +19,17 @@ function FindProxyForURL(url, host) {
         "203.117.155.106"
     ];
 
+    // Nếu host nằm trong danh sách block thì chặn bằng proxy
     for (var i = 0; i < blockList.length; i++) {
         if (dnsDomainIs(host, blockList[i]) || shExpMatch(host, "*." + blockList[i])) {
             return "PROXY 127.0.0.1:8080";
         }
     }
 
-    return "DIRECT";
+    // Cho phép ID DNS 7f5c51 hoạt động bình thường
+    if (dnsDomainIs(host, "7f5c51.dns") || shExpMatch(host, "*.7f5c51.dns")) {
+        return "DIRECT"; // Không chặn
+    }
+
+    return "DIRECT"; // Các kết nối khác vẫn hoạt động bình thường
 }
